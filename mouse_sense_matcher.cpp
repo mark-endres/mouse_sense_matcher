@@ -19,7 +19,7 @@ using namespace std;
 
 const string tab = "\t";
 
-bool measurement_actice = false;
+bool measurement_active = false;
 int64_t x_sum = 0;
 uint64_t dx_abs = 0;
 
@@ -200,7 +200,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		unsigned size = sizeof(RAWINPUT);
 		static RAWINPUT raw[sizeof(RAWINPUT)];
 		GetRawInputData((HRAWINPUT)lParam, RID_INPUT, raw, &size, sizeof(RAWINPUTHEADER));
-		if (raw->header.dwType == RIM_TYPEMOUSE && measurement_actice) {
+		if (raw->header.dwType == RIM_TYPEMOUSE && measurement_active) {
 			x_sum += (int64_t)raw->data.mouse.lLastX;
 			dx_abs = abs(x_sum);
 			// override the number in console line
@@ -253,17 +253,13 @@ int main(void) {
 	}
 
 	ShowWindow(hWnd, SW_HIDE);
-	///
-	
+
 	// resize main window
 	HWND console = GetConsoleWindow();
 	RECT r;
 	GetWindowRect(console, &r);
 	MoveWindow(console, r.left, r.top, 800, 800, TRUE);	
 
-	/*for (int i = 0; i<255; i++) {
-		cout_colored("TEST" + to_string(i), i);	cout << endl;
-	};*/
 
 	// menu 
 	const int cl_blue_yellow = 105;
@@ -315,7 +311,7 @@ int main(void) {
 	cout_colored("==========================================================================", cl_blue_yellow); cout << endl
 		<< endl 
 		 << endl;
-	///
+
 
 	bool exit = false;
 	bool measurement_valid = false;
@@ -338,12 +334,12 @@ int main(void) {
 	CKey *key_RIGHT = keyFac.addKey(VK_RIGHT);
 	CKey *key_UP    = keyFac.addKey(VK_UP);
 	CKey *key_DOWN  = keyFac.addKey(VK_DOWN);
-	
+
 	// assign event handlers
 	key_X->OnPressedHandler = [&] (void) -> void {
 		exit = true;
 	};
-	
+
 	key_F8->OnReleasedHandler = [&] (void) -> void {
 		if (blocked) {
 			return;
@@ -369,10 +365,10 @@ int main(void) {
 			cout_error("Input must be a positive number");			
 		}	
 	};
-	
+
 	key_F9->OnReleasedHandler = [&] (void) -> void {
-		measurement_actice = !measurement_actice;
-		if (measurement_actice) {
+		measurement_active = !measurement_active;
+		if (measurement_active) {
 			cout << "Started measurement ..." << endl;
 			cout << "x distance in pixels: ";
 			blocked = true;
@@ -396,7 +392,7 @@ int main(void) {
 			}
 		}
 	};
-	
+
 	key_F10->OnReleasedHandler = [&] (void) -> void {
 		if (blocked) {
 			return;
@@ -408,7 +404,7 @@ int main(void) {
 		CMouse::move_x_500Hz((int64_t)(rotation_clockwise ? dx_abs : -dx_abs), 10);
 		rotation_clockwise = !rotation_clockwise;
 	};
-	
+
 	auto mouse_move_ADS = [&] (uint64_t dx) -> void {
 		if (blocked) {
 			return;
@@ -471,8 +467,8 @@ int main(void) {
 			step -= STEP_INCREASE;
 		}
 	};
-	///
-		
+
+
 	while (1) {
 		// process message queue
 		MSG msg;
